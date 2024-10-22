@@ -12,6 +12,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -111,5 +112,15 @@ public class UserServiceImpl implements UserService {
     @Override
     public boolean isCorrectConfirmPassword(User user) {
         return user.getPassword().equals(user.getConfirmPassword());
+    }
+
+    @Override
+    public void deleteUser(Long id) {
+        userRepository.deleteById(id);
+    }
+
+    @Override
+    public List<User> searchByName(String name) {
+        return userRepository.findByUsernameContainingIgnoreCase(name);
     }
 }

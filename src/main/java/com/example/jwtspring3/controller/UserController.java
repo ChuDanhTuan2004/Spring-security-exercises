@@ -6,6 +6,7 @@ import com.example.jwtspring3.model.User;
 import com.example.jwtspring3.service.RoleService;
 import com.example.jwtspring3.service.UserService;
 import com.example.jwtspring3.service.impl.JwtService;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,9 +19,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashSet;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 @RestController
 @CrossOrigin("*")
@@ -50,22 +49,30 @@ public class UserController {
     @GetMapping("/admin/users")
     public ResponseEntity<Iterable<User>> showAllUserByAdmin() {
         Iterable<User> users = userService.findAll();
-        return new ResponseEntity<>(users, HttpStatus.OK);
+        List<User> nonAdminUsers = new ArrayList<>();
+        for (User user : users) {
+            boolean isAdmin = user.getRoles().stream()
+                    .anyMatch(role -> role.getName().equals("ROLE_ADMIN"));
+            if (!isAdmin) {
+                nonAdminUsers.add(user);
+            }
+        }
+        return new ResponseEntity<>(nonAdminUsers, HttpStatus.OK);
     }
 
     @PostMapping("/register")
-    public ResponseEntity createUser(@RequestBody User user, BindingResult bindingResult) {
+    public ResponseEntity<?> createUser(@RequestBody User user, BindingResult bindingResult) {
         if (bindingResult.hasFieldErrors()) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
         Iterable<User> users = userService.findAll();
         for (User currentUser : users) {
             if (currentUser.getUsername().equals(user.getUsername())) {
-                return new ResponseEntity<>("Username existed",HttpStatus.OK);
+                return new ResponseEntity<>("Username existed", HttpStatus.OK);
             }
         }
         if (!userService.isCorrectConfirmPassword(user)) {
-            return new ResponseEntity<>("Input confirm password",HttpStatus.OK);
+            return new ResponseEntity<>("Input confirm password", HttpStatus.OK);
         }
         if (user.getRoles() != null) {
             Role role = roleService.findByName("ROLE_ADMIN");
@@ -105,20 +112,47 @@ public class UserController {
         return userOptional.map(user -> new ResponseEntity<>(user, HttpStatus.OK)).orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 
+    @PostMapping("/logout")
+    public ResponseEntity<?> logout(HttpServletRequest request) {
+        String authHeader = request.getHeader("Authorization");
+        if (authHeader != null && authHeader.startsWith("Bearer ")) {
+            String jwt = authHeader.substring(7);
+            // Thêm token vào blacklist (cần triển khai)
+            jwtService.addToBlacklist(jwt);
+        }
+
+        // Xóa authentication khỏi SecurityContext
+        SecurityContextHolder.clearContext();
+
+        return ResponseEntity.ok("Logged out successfully");
+    }
+
     @PutMapping("/users/{id}")
-    public ResponseEntity<User> updateUserProfile(@PathVariable Long id, @RequestBody User user) {
-        Optional<User> userOptional = this.userService.findById(id);
-        if (!userOptional.isPresent()) {
+    public ResponseEntity<User> updateUser(@PathVariable Long id, @RequestBody User user) {
+        Optional<User> userOptional = userService.findById(id);
+        if (userOptional.isEmpty()) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-        user.setId(userOptional.get().getId());
-        user.setUsername(userOptional.get().getUsername());
-        user.setEnabled(userOptional.get().isEnabled());
-        user.setPassword(userOptional.get().getPassword());
-        user.setRoles(userOptional.get().getRoles());
-        user.setConfirmPassword(userOptional.get().getConfirmPassword());
+        User existingUser = userOptional.get();
+        existingUser.setUsername(user.getUsername());
+        existingUser.setPassword(passwordEncoder.encode(user.getPassword()));
+        existingUser.setRoles(user.getRoles());
+        userService.save(existingUser);
+        return new ResponseEntity<>(existingUser, HttpStatus.OK);
+    }
 
-        userService.save(user);
-        return new ResponseEntity<>(user, HttpStatus.OK);
+    @DeleteMapping("/users/{id}")
+    public ResponseEntity<?> deleteUser(@PathVariable Long id) {
+        userService.deleteUser(id);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
+    @GetMapping("/users/search")
+    public ResponseEntity<List<User>> searchUsersByName(@RequestParam String name) {
+        List<User> users = userService.searchByName(name);
+        if (users.isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        }
+        return new ResponseEntity<>(users, HttpStatus.OK);
     }
 }
