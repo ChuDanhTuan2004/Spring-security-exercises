@@ -4,10 +4,12 @@ import com.example.jwtspring3.model.library.Book;
 import com.example.jwtspring3.request.BookRequest;
 import com.example.jwtspring3.request.PaginateRequest;
 import com.example.jwtspring3.service.library.BookService;
+import jakarta.servlet.annotation.MultipartConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
@@ -24,6 +26,7 @@ import java.util.NoSuchElementException;
 @RestController
 @CrossOrigin("*")
 @RequestMapping("/books")
+@MultipartConfig(location = "/src/main/resources/static/bookImages/", maxFileSize = 1024 * 1024 * 5) // 5MB
 public class BookController {
     @Autowired
     private BookService bookService;
@@ -111,15 +114,24 @@ public class BookController {
         }
     }
 
-    @PostMapping("/upload")
-    public ResponseEntity<?> uploadImage(@RequestParam("file") MultipartFile file, @RequestParam("bookId") Long bookId) throws IOException {
+    @PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<?> uploadImage(@RequestPart("file") MultipartFile file, @RequestParam("bookId") Long bookId) throws IOException {
         if (file.isEmpty()) {
             return ResponseEntity.badRequest().body("Please select a file to upload");
         }
 
-        String fileName = StringUtils.cleanPath(file.getOriginalFilename());
+        if (file == null || file.isEmpty()) {
+            return ResponseEntity.badRequest().body("Vui lòng chọn một tệp để tải lên");
+        }
+
+        String originalFilename = file.getOriginalFilename();
+        if (originalFilename == null) {
+            return ResponseEntity.badRequest().body("Tên tệp là null");
+        }
+
+        String fileName = StringUtils.cleanPath(originalFilename);
         String uploadDir = "src/main/resources/static/bookImages/";
-        String fileUrl = "/bookImages/" + fileName;
+        String fileUrl = "bookImages/" + fileName;
 
         Path uploadPath = Paths.get(uploadDir);
         if (!Files.exists(uploadPath)) {
