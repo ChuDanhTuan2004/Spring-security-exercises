@@ -33,13 +33,22 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
-    public Book saveBook(Book book) {
-        if (book.getCategory() != null && book.getCategory().getCategoryId() != null) {
-            Category category = categoryRepository.findById(book.getCategory().getCategoryId())
+    public Book saveBook(BookRequest book) {
+        Book newBook = new Book();
+        if (book.getCategoryId() != null) {
+            Category category = categoryRepository.findById(book.getCategoryId())
                     .orElseThrow(() -> new IllegalArgumentException("Invalid category ID"));
-            book.setCategory(category);
+            newBook.setCategory(category);
         }
-        return bookRepository.save(book);
+        newBook.setAuthor(book.getAuthor());
+        newBook.setTitle(book.getTitle());
+        newBook.setPublisher(book.getPublisher());
+        newBook.setPublishYear(book.getPublishYear());
+        newBook.setQuantity(book.getQuantity());
+        newBook.setImageUrl(book.getImage()); // Set the image URL if provided
+        newBook.setDescription(book.getDescription());
+        newBook.setUrl(book.getUrl());
+        return bookRepository.save(newBook);
     }
 
     @Override

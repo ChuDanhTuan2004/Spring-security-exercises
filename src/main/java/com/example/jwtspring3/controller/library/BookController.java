@@ -67,7 +67,7 @@ public class BookController {
     }
 
     @PostMapping("")
-    public ResponseEntity<?> createBook(@RequestBody Book book) {
+    public ResponseEntity<?> createBook(@RequestBody BookRequest book) {
         try {
             Book savedBook = bookService.saveBook(book);
             return new ResponseEntity<>(savedBook, HttpStatus.CREATED);
@@ -145,7 +145,8 @@ public class BookController {
             // Update book's imageUrl
             Book book = bookService.getBookById(bookId).orElseThrow(() -> new RuntimeException("Book not found"));
             book.setImageUrl(fileUrl);
-            bookService.saveBook(book);
+
+//            bookService.saveBook(book);
 
             return ResponseEntity.ok().body("File uploaded successfully. URL: " + fileUrl);
         } catch (IOException e) {

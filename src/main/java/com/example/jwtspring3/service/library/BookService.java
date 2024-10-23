@@ -9,7 +9,7 @@ import java.util.Optional;
 
 public interface BookService {
     Optional<Book> getBookById(Long id);
-    Book saveBook(Book book);
+    Book saveBook(BookRequest book);
     void deleteBook(Long id);
     Page<Book> findAll(BookRequest roomRequest, PaginateRequest paginateRequest);
 
