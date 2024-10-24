@@ -45,7 +45,7 @@ public class BookServiceImpl implements BookService {
         newBook.setPublisher(book.getPublisher());
         newBook.setPublishYear(book.getPublishYear());
         newBook.setQuantity(book.getQuantity());
-        newBook.setImageUrl(book.getImage()); // Set the image URL if provided
+        newBook.setImageUrl(book.getImageUrl()); // Set the image URL if provided
         newBook.setDescription(book.getDescription());
         newBook.setUrl(book.getUrl());
         return bookRepository.save(newBook);
@@ -68,7 +68,7 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
-    public Book updateBook(Long id, Book book) {
+    public Book updateBook(Long id, BookRequest book) {
         Book existingBook = bookRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("Book not found with id: " + id));
 
@@ -77,9 +77,10 @@ public class BookServiceImpl implements BookService {
         existingBook.setPublisher(book.getPublisher());
         existingBook.setPublishYear(book.getPublishYear());
         existingBook.setQuantity(book.getQuantity());
+        existingBook.setImageUrl(book.getImageUrl()); // Update the image URL if provided
 
-        if (book.getCategory() != null && book.getCategory().getCategoryId() != null) {
-            Category category = categoryRepository.findById(book.getCategory().getCategoryId())
+        if (book.getCategoryId() != null) {
+            Category category = categoryRepository.findById(book.getCategoryId())
                     .orElseThrow(() -> new IllegalArgumentException("Invalid category ID"));
             existingBook.setCategory(category);
         }

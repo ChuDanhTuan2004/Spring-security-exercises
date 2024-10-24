@@ -13,5 +13,5 @@ public interface BookService {
     void deleteBook(Long id);
     Page<Book> findAll(BookRequest roomRequest, PaginateRequest paginateRequest);
 
-    Book updateBook(Long id, Book book);
+    Book updateBook(Long id, BookRequest book);
 }
