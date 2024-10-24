@@ -11,7 +11,7 @@ public interface WishlistService {
     Optional<Wishlist> getWishlistById(Long id);
     Wishlist updateWishlist(Long id, Wishlist wishlist);
     void deleteWishlist(Long id);
-    void addBookToWishlist(Long userId, Long bookId);
+    Wishlist addBookToWishlist(Long userId, Long bookId);
     void removeBookFromWishlist(Long userId, Long bookId);
     Wishlist getWishlistByUserId(Long userId);
 }
