@@ -31,8 +31,8 @@ public class WishlistController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Wishlist> updateWishlist(@PathVariable Long id, @RequestBody Wishlist wishlist) {
-        Wishlist updatedWishlist = wishlistService.updateWishlist(id, wishlist);
+    public ResponseEntity<Wishlist> updateWishlist(@PathVariable Long id, @RequestBody User user) {
+        Wishlist updatedWishlist = wishlistService.addBookToWishlist(id, user.getId());
         if (updatedWishlist != null) {
             return new ResponseEntity<>(updatedWishlist, HttpStatus.OK);
         } else {
