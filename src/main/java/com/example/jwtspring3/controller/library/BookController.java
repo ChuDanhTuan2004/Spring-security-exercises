@@ -69,7 +69,7 @@ public class BookController {
     @PostMapping("")
     public ResponseEntity<?> createBook(@RequestBody BookRequest book) {
         try {
-            Book savedBook = bookService.saveBook(book);
+            Book savedBook = bookService.createBookWithDefaultImage(book);
             return new ResponseEntity<>(savedBook, HttpStatus.CREATED);
         } catch (DataIntegrityViolationException e) {
             return ResponseEntity
