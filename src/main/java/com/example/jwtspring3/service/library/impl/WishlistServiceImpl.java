@@ -33,25 +33,27 @@ public class WishlistServiceImpl implements WishlistService {
 
     @Override
     public Wishlist addBookToWishlist(Long userId, Long bookId) {
-          Optional<Wishlist> wishlist = wishlistRepository.findByUserId(userId);
-          if(wishlist.isPresent()){
-             Optional<Book> book = bookRepository.findById(bookId);
-             if(book.isPresent()){
-                 wishlist.get().getBooks().add(book.get());
+        Optional<Wishlist> wishlist = wishlistRepository.findByUserId(userId);
+        if (wishlist.isPresent()) {
+            Optional<Book> book = bookRepository.findById(bookId);
+            if (book.isPresent()) {
+                wishlist.get().getBooks().add(book.get());
                 return wishlistRepository.save(wishlist.get());
-             }
-          }else{
-              Wishlist newWishlist = new Wishlist();
-              newWishlist.setUser(userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found with id: " + userId)));
-              Optional<Book> book = bookRepository.findById(bookId);
-              if(book.isPresent()){
-                  newWishlist.getBooks().add(book.get());
-                 return wishlistRepository.save(newWishlist);
-              }else{
-                  throw new RuntimeException("Book not found with id: " + bookId);
-              }
-          }
+            }
+        } else {
+            Wishlist newWishlist = new Wishlist();
+            newWishlist.setUser(userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found with id: " + userId)));
+            Optional<Book> book = bookRepository.findById(bookId);
+            if (book.isPresent()) {
+                newWishlist.getBooks().add(book.get());
+                return wishlistRepository.save(newWishlist);
+            } else {
+                throw new RuntimeException("Book not found with id: " + bookId);
+            }
+        }
+        return new Wishlist();
     }
+
 
     @Override
     public void removeBookFromWishlist(Long userId, Long bookId) {
