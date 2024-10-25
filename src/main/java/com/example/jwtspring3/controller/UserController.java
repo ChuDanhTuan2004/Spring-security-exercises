@@ -3,6 +3,7 @@ package com.example.jwtspring3.controller;
 import com.example.jwtspring3.model.JwtResponse;
 import com.example.jwtspring3.model.Role;
 import com.example.jwtspring3.model.User;
+import com.example.jwtspring3.request.UserDTO;
 import com.example.jwtspring3.service.RoleService;
 import com.example.jwtspring3.service.UserService;
 import com.example.jwtspring3.service.impl.JwtService;
@@ -154,5 +155,13 @@ public class UserController {
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         }
         return new ResponseEntity<>(users, HttpStatus.OK);
+    }
+
+    @GetMapping("/users/current")
+    public ResponseEntity<UserDTO> getCurrentUser() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+        UserDTO userDTO = userService.getUserByUsername(username);
+        return ResponseEntity.ok(userDTO);
     }
 }

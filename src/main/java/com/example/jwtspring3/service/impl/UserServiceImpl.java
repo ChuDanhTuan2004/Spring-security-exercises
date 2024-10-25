@@ -4,6 +4,7 @@ package com.example.jwtspring3.service.impl;
 import com.example.jwtspring3.model.User;
 import com.example.jwtspring3.model.UserPrinciple;
 import com.example.jwtspring3.repository.UserRepository;
+import com.example.jwtspring3.request.UserDTO;
 import com.example.jwtspring3.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -122,5 +123,22 @@ public class UserServiceImpl implements UserService {
     @Override
     public List<User> searchByName(String name) {
         return userRepository.findByUsernameContainingIgnoreCase(name);
+    }
+
+    @Override
+    public UserDTO getUserByUsername(String username) {
+        User user = userRepository.findByUsername(username);
+        if (user == null) {
+            throw new UsernameNotFoundException("Không tìm thấy người dùng với tên đăng nhập: " + username);
+        }
+        return convertToDTO(user);
+    }
+
+    private UserDTO convertToDTO(User user) {
+        UserDTO dto = new UserDTO();
+        dto.setId(user.getId());
+        dto.setUsername(user.getUsername());
+        dto.setEmail(user.getEmail());
+        return dto;
     }
 }
