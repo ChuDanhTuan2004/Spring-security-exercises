@@ -33,4 +33,8 @@ public interface UserService extends UserDetailsService {
     List<User> searchByName(String name);
 
     UserDTO getUserByUsername(String username);
+
+    List<User> findUsersAppend();
+
+    void acceptUser(Long id);
 }

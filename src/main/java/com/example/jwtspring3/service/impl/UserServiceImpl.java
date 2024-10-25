@@ -6,6 +6,7 @@ import com.example.jwtspring3.model.UserPrinciple;
 import com.example.jwtspring3.repository.UserRepository;
 import com.example.jwtspring3.request.UserDTO;
 import com.example.jwtspring3.service.UserService;
+import com.example.jwtspring3.service.library.impl.EmailService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -20,6 +21,9 @@ import java.util.Optional;
 public class UserServiceImpl implements UserService {
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private EmailService emailService;
 
     @Override
     @Transactional
@@ -40,6 +44,19 @@ public class UserServiceImpl implements UserService {
                 accountNonLocked, null);
     }
 
+    @Override
+    public List<User> findUsersAppend() {
+        return userRepository.findUsersByEnabled(false);
+    }
+
+    @Override
+    public void acceptUser(Long id) {
+        userRepository.findById(id).ifPresent(user -> {
+            user.setEnabled(true);
+            emailService.sendRegistrationApprovalEmail(user.getEmail(),user.getUsername(),user.getPassword());
+            userRepository.save(user);
+        });
+    }
 
     @Override
     public void save(User user) {
