@@ -137,7 +137,6 @@ public class UserController {
         User existingUser = userOptional.get();
         existingUser.setUsername(user.getUsername());
         existingUser.setPassword(passwordEncoder.encode(user.getPassword()));
-        existingUser.setRoles(user.getRoles());
         userService.save(existingUser);
         return new ResponseEntity<>(existingUser, HttpStatus.OK);
     }
