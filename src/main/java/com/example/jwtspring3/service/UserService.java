@@ -2,6 +2,7 @@ package com.example.jwtspring3.service;
 
 
 import com.example.jwtspring3.model.User;
+import com.example.jwtspring3.request.UserDTO;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 
@@ -30,4 +31,6 @@ public interface UserService extends UserDetailsService {
     void deleteUser(Long id);
 
     List<User> searchByName(String name);
+
+    UserDTO getUserByUsername(String username);
 }

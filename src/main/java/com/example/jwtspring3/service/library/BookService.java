@@ -11,6 +11,9 @@ public interface BookService {
     Optional<Book> getBookById(Long id);
     Book saveBook(BookRequest book);
     void deleteBook(Long id);
+
+    Book createBookWithDefaultImage(BookRequest book);
+
     Page<Book> findAll(BookRequest roomRequest, PaginateRequest paginateRequest);
 
     Book updateBook(Long id, BookRequest book);

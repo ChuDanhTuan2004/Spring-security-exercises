@@ -21,6 +21,8 @@ import java.util.Optional;
 @Service
 public class BookServiceImpl implements BookService {
 
+    private static final String DEFAULT_IMAGE_URL = "https://firebasestorage.googleapis.com/v0/b/demofirebase-6e7a1.appspot.com/o/images%2Flogo%20hoa%20thanh%20do.png?alt=media&token=undefined";
+
     @Autowired
     private BookRepository bookRepository;
 
@@ -50,6 +52,28 @@ public class BookServiceImpl implements BookService {
         newBook.setUrl(book.getUrl());
         return bookRepository.save(newBook);
     }
+
+    @Override
+    public Book createBookWithDefaultImage(BookRequest book) {
+        Book newBook = new Book();
+        if (book.getCategoryId() != null) {
+            Category category = categoryRepository.findById(book.getCategoryId())
+                    .orElseThrow(() -> new IllegalArgumentException("Invalid category ID"));
+            newBook.setCategory(category);
+        }
+        newBook.setAuthor(book.getAuthor());
+        newBook.setTitle(book.getTitle());
+        newBook.setPublisher(book.getPublisher());
+        newBook.setPublishYear(book.getPublishYear());
+        newBook.setQuantity(book.getQuantity());
+        newBook.setImageUrl(book.getImageUrl() != null && !book.getImageUrl().isEmpty()
+                ? book.getImageUrl()
+                : DEFAULT_IMAGE_URL); // Set default image URL if not provided
+        newBook.setDescription(book.getDescription());
+        newBook.setUrl(book.getUrl());
+        return bookRepository.save(newBook);
+    }
+
 
     @Override
     public Page<Book> findAll(BookRequest bookRequest, PaginateRequest paginateRequest) {

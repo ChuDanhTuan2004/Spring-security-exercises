@@ -17,4 +17,5 @@ public class BookRequest {
     private String description;
     private String imageUrl;
     private String url;
+
 }
