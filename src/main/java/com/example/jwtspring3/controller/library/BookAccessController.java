@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/book-access")
+@CrossOrigin("*")
 public class BookAccessController {
     private final BookAccessService bookAccessService;
 
