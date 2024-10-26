@@ -7,6 +7,7 @@ import com.example.jwtspring3.request.UserDTO;
 import com.example.jwtspring3.service.RoleService;
 import com.example.jwtspring3.service.UserService;
 import com.example.jwtspring3.service.impl.JwtService;
+import com.example.jwtspring3.service.library.impl.EmailService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -40,6 +41,9 @@ public class UserController {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    @Autowired
+    private EmailService emailService;
+
 
     @GetMapping("/users")
     public ResponseEntity<Iterable<User>> showAllUser() {
@@ -59,6 +63,15 @@ public class UserController {
             }
         }
         return new ResponseEntity<>(nonAdminUsers, HttpStatus.OK);
+    }
+    @GetMapping("/users/append")
+    public ResponseEntity<List<User>> showAllAppendAccount(){
+        return new ResponseEntity<>(userService.findUsersAppend(),HttpStatus.OK);
+    }
+    @PutMapping("/users/append/{id}")
+    public ResponseEntity<?> updateAppendAccount(@PathVariable Long id){
+        userService.acceptUser(id);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @PostMapping("/register")
@@ -88,6 +101,7 @@ public class UserController {
         }
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         user.setConfirmPassword(passwordEncoder.encode(user.getConfirmPassword()));
+        user.setEnabled(false);
         userService.save(user);
         return new ResponseEntity<>(user, HttpStatus.CREATED);
     }
