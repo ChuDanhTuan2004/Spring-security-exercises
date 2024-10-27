@@ -5,6 +5,7 @@ import com.example.jwtspring3.model.library.BookAccessPermission;
 import com.fasterxml.jackson.core.JsonFactory;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.auth.oauth2.GoogleCredentials;
+import jakarta.mail.Message;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.extern.slf4j.Slf4j;
