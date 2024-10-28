@@ -3,6 +3,7 @@ package com.example.jwtspring3.controller.library;
 import com.example.jwtspring3.model.library.Book;
 import com.example.jwtspring3.request.BookRequest;
 import com.example.jwtspring3.request.PaginateRequest;
+import com.example.jwtspring3.service.UserService;
 import com.example.jwtspring3.service.library.BookService;
 import jakarta.servlet.annotation.MultipartConfig;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +22,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.List;
 import java.util.NoSuchElementException;
 
 @RestController
@@ -30,6 +32,9 @@ import java.util.NoSuchElementException;
 public class BookController {
     @Autowired
     private BookService bookService;
+
+    @Autowired
+    private UserService userService;
 
     @GetMapping("")
     public ResponseEntity<Page<Book>> getBooks(
@@ -51,6 +56,14 @@ public class BookController {
 
         PaginateRequest paginateRequest = new PaginateRequest(page, size);
         Page<Book> paginatedBooks = bookService.findAll(bookRequest, paginateRequest);
+        if(!userService.getCurrentUser().getRoles().contains("ROLE_ADMIN")) {
+            List<Book> books = paginatedBooks.getContent();
+            books.stream().forEach(book -> {
+                book.setUrl(null);
+            });// Remove unavailable books for non-admin users
+            paginatedBooks.getContent().clear();
+            paginatedBooks.getContent().addAll(books);
+        }
 
         if (paginatedBooks.isEmpty()) {
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);

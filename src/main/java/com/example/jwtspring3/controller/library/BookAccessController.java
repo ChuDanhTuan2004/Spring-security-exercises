@@ -1,6 +1,7 @@
 package com.example.jwtspring3.controller.library;
 
 import com.example.jwtspring3.model.library.BookAccessRequest;
+import com.example.jwtspring3.service.UserService;
 import com.example.jwtspring3.service.library.BookAccessService;
 import com.example.jwtspring3.service.library.dto.BookAccessRequestDTO;
 import com.example.jwtspring3.service.library.dto.ProcessRequestDTO;
@@ -15,9 +16,7 @@ public class BookAccessController {
     private final BookAccessService bookAccessService;
 
     @Autowired
-    public BookAccessController(BookAccessService bookAccessService) {
-        this.bookAccessService = bookAccessService;
-    }
+    public BookAccessController(BookAccessService bookAccessService) {this.bookAccessService = bookAccessService;}
 
     @PostMapping("/request")
     public ResponseEntity<BookAccessRequest> createRequest(
