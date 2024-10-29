@@ -62,7 +62,9 @@ public class EmailService {
                     <p><strong>Tên đăng nhập:</strong> %s</p>
                     <p><strong>Mật khẩu:</strong> %s</p>
                 </div>
-                <p>Vui lòng đổi mật khẩu ngay sau khi đăng nhập lần đầu tiên.</p>
+                <div style="background-color: red; padding: 15px; border-radius: 5px;">
+                <p>Vui lòng đổi mật khẩu ngay sau khi đăng nhập lần đầu tiên!</p>
+                </div>
                 <p>Trân trọng,<br/>Đội ngũ Thư viện</p>
             </body>
             </html>

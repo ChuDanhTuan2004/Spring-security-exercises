@@ -10,8 +10,12 @@ import com.example.jwtspring3.repository.library.BookAccessPermissionRepository;
 import com.example.jwtspring3.repository.library.BookAccessRequestRepository;
 import com.example.jwtspring3.repository.library.BookRepository;
 import com.example.jwtspring3.repository.library.NotificationRepository;
+import com.example.jwtspring3.request.BookAccessRequestDetailDTO;
 import com.example.jwtspring3.service.library.BookAccessService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -117,5 +121,28 @@ public class BookAccessServiceImpl implements BookAccessService {
         Optional<BookAccessPermission> permission =
                 permissionRepository.findByUserAndBookAndActiveIs(user, book, true);
         return permission.isPresent();
+    }
+
+    @Override
+    public Page<BookAccessRequest> getPendingRequests(int page, int size) {
+        PageRequest pageRequest = PageRequest.of(page, size);
+        return requestRepository.findByStatusOrderByRequestDateDesc(RequestStatus.PENDING, pageRequest);
+    }
+
+    @Override
+    public Page<BookAccessRequestDetailDTO> getAllRequestsWithDetails(Pageable pageable, RequestStatus status, String username, String bookTitle) {
+        Page<BookAccessRequest> requests = requestRepository.findAllWithFilters(status, username, bookTitle, pageable);
+        return requests.map(this::convertToDetailDTO);
+    }
+
+    private BookAccessRequestDetailDTO convertToDetailDTO(BookAccessRequest request) {
+        BookAccessRequestDetailDTO dto = new BookAccessRequestDetailDTO();
+        dto.setId(request.getId());
+        dto.setUsername(request.getUser().getUsername());
+        dto.setBookTitle(request.getBook().getTitle());
+        dto.setStatus(request.getStatus());
+        dto.setRequestDate(request.getRequestDate());
+        dto.setReason(request.getReason());
+        return dto;
     }
 }
