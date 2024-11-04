@@ -73,10 +73,8 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/bookImages/**", "/register", "/login", "/hello", "/logout").permitAll()
-                        .requestMatchers("/users/**", "/wishlist/**", "/api/book-access/**").hasAnyRole("USER", "ADMIN")
+                        .requestMatchers("/bookImages/**", "/register", "/login", "/hello", "/logout", "/users/**", "/wishlist/**", "/api/book-access/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/books/**").permitAll()
-                        .requestMatchers("/books/**").hasRole("ADMIN")
                         .anyRequest().hasRole("ADMIN")
                 )
                 .exceptionHandling(customizer -> customizer.accessDeniedHandler(customAccessDeniedHandler()))

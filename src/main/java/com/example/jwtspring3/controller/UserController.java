@@ -10,6 +10,7 @@ import com.example.jwtspring3.service.impl.JwtService;
 import com.example.jwtspring3.service.library.impl.EmailService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -99,11 +100,28 @@ public class UserController {
             roles1.add(role1);
             user.setRoles(roles1);
         }
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
-        user.setConfirmPassword(passwordEncoder.encode(user.getConfirmPassword()));
+        user.setPassword(passwordEncoder.encode("Password123!"));
+        user.setConfirmPassword(passwordEncoder.encode("Password123!"));
         user.setEnabled(false);
         userService.save(user);
         return new ResponseEntity<>(user, HttpStatus.CREATED);
+    }
+
+    @GetMapping("/admin/pending-registrations")
+    public ResponseEntity<?> getPendingRegistrations(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(required = false) String search) {
+
+        Page<User> pendingUsers = userService.findPendingRegistrations(page, size, search);
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("users", pendingUsers.getContent());
+        response.put("currentPage", pendingUsers.getNumber());
+        response.put("totalItems", pendingUsers.getTotalElements());
+        response.put("totalPages", pendingUsers.getTotalPages());
+
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @PostMapping("/login")

@@ -3,6 +3,7 @@ package com.example.jwtspring3.service;
 
 import com.example.jwtspring3.model.User;
 import com.example.jwtspring3.request.UserDTO;
+import org.springframework.data.domain.Page;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 
@@ -37,4 +38,5 @@ public interface UserService extends UserDetailsService {
     List<User> findUsersAppend();
 
     void acceptUser(Long id);
+    Page<User> findPendingRegistrations(int page, int size, String search);
 }

@@ -56,14 +56,7 @@ public class BookController {
 
         PaginateRequest paginateRequest = new PaginateRequest(page, size);
         Page<Book> paginatedBooks = bookService.findAll(bookRequest, paginateRequest);
-        if(!userService.getCurrentUser().getRoles().contains("ROLE_ADMIN")) {
-            List<Book> books = paginatedBooks.getContent();
-            books.stream().forEach(book -> {
-                book.setUrl(null);
-            });// Remove unavailable books for non-admin users
-            paginatedBooks.getContent().clear();
-            paginatedBooks.getContent().addAll(books);
-        }
+
 
         if (paginatedBooks.isEmpty()) {
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);

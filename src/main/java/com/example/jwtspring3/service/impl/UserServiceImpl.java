@@ -8,6 +8,9 @@ import com.example.jwtspring3.request.UserDTO;
 import com.example.jwtspring3.service.UserService;
 import com.example.jwtspring3.service.library.impl.EmailService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -55,7 +58,7 @@ public class UserServiceImpl implements UserService {
     public void acceptUser(Long id) {
         userRepository.findById(id).ifPresent(user -> {
             user.setEnabled(true);
-            emailService.sendRegistrationApprovalEmail(user.getEmail(),user.getUsername(),user.getPassword());
+            emailService.sendRegistrationApprovalEmail(user.getEmail(),user.getUsername());
             userRepository.save(user);
         });
     }
@@ -159,5 +162,16 @@ public class UserServiceImpl implements UserService {
         dto.setUsername(user.getUsername());
         dto.setEmail(user.getEmail());
         return dto;
+    }
+
+    @Override
+    public Page<User> findPendingRegistrations(int page, int size, String search) {
+        Pageable pageable = PageRequest.of(page, size);
+
+        if (search != null && !search.isEmpty()) {
+            return userRepository.findByEnabledFalseAndUsernameContaining(search, pageable);
+        } else {
+            return userRepository.findByEnabledFalse(pageable);
+        }
     }
 }
